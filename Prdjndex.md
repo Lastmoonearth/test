@@ -1,0 +1,151 @@
+﻿# My Arcade — Index Page Instructions
+
+## Purpose and files
+
+Build `index.html` as the royal-themed home page for My Arcade. Visitors choose between the two available games. Open `index.html` directly in a browser; no server, build step, JavaScript, external fonts, or downloaded assets are required. Keep `index.html`, `game.html`, and `Game2.html` in the same directory.
+
+## Page content
+
+- Set the document language to English, use UTF-8, and include the responsive viewport meta tag.
+- Set the browser title to `My Arcade — The Royal Collection` and the theme color to `#211030`.
+- Display a centered gold crown (`♛`) inside a circular crest.
+- Show the uppercase eyebrow `The Royal Collection`, followed by the main heading `My Arcade`.
+- Add an ornamental diamond divider (`◆`) with thin gold lines on either side.
+- Show the introduction on two lines: `Your next adventure awaits, Your Majesty.` and `Choose your challenge and claim your glory.`
+- Show two available game cards, each with an illustration symbol, category, title, description, and working play link.
+- End with the italic footer: `A kingdom of games. A legacy of champions.`
+
+## Game cards and navigation
+
+### Game 01
+
+- Symbol: crossed swords (`⚔`) against a dark emerald background.
+- Category: `Game 01 · Survival`.
+- Title: `Knight of the Emerald Keep`.
+- Description: `Defend the kingdom against slime hordes and powerful bosses. Swing your sword, raise your shield, and survive each level.`
+- Link text: `Play Knight →`.
+- Link destination: `game.html`.
+
+### Game 02
+
+- Symbol: lightning (`⚡`) against a dark purple background.
+- Category: `Game 02 · Two-player arena`.
+- Title: `Arcade Rivals`.
+- Description: `Challenge a friend with 10 unique fighters, special moves, summons, and powerful ultimates across three arenas.`
+- Link text: `Play Arcade Rivals →`.
+- Link destination: `Game2.html`; preserve capitalization for case-sensitive hosting.
+
+Use ordinary anchor links so mouse, touch, and keyboard users can open either game. Both games provide navigation back to `index.html`. The games share the purple-and-gold royal theme; their gameplay instructions belong in their own requirement documents.
+
+## Royal visual design
+
+- Use a deep purple gradient background with a soft purple glow near the top.
+- Main background colors: `#211030` and `#120a1d`; glow: `#51315d`.
+- Primary gold: `#e8c778`; heading and primary text cream: `#fff3d6`; secondary text: `#c9bbd4`.
+- Use Georgia with Times New Roman and serif fallbacks for headings, the crest, and the footer. Use Trebuchet MS with a sans-serif fallback for body text.
+- Add a subtle fixed gold border around the viewport. It must not intercept clicks or touches.
+- Center the content within a maximum width of 980px, with generous vertical spacing.
+- Give the crown crest a 76px circular frame, translucent gold border, and subtle glow.
+- Scale the main heading with `clamp(48px,9vw,92px)`.
+- Use purple gradient cards (`#392246` to `#21132f`) with muted gold borders (`#b5904f`), 16px corners, and soft shadows.
+- Make the symbol areas 150px tall with inset borders and rounded corners.
+- Use gold uppercase category labels with spaced lettering.
+- Keep descriptions readable with 1.7 line height. Use flex layouts inside cards so play links align at the bottom.
+- Make play links full-width gold gradient buttons (`#f1d696` to `#ceaa59`) with dark purple text, a pale gold border, and 6px corners.
+- On hover, brighten play links and add a subtle gold shadow.
+
+## Responsive layout
+
+- On screens wider than 640px, arrange the cards in two equal columns with a 26px gap.
+- At 640px and below, stack cards in one column, reduce card padding to 22px, and use 20px horizontal page margins.
+- Reduce the decorative viewport border inset from 14px to 8px on small screens.
+- Keep headings, descriptions, and links readable without horizontal scrolling.
+
+## Accessibility
+
+- Use semantic `main`, `section`, `article`, `h1`, and `h2` elements.
+- Label the game selection section `Choose a game`.
+- Mark the crown, divider, and illustration symbols `aria-hidden="true"` because their meaning is supplied by visible text.
+- Provide visible keyboard focus on play links using a 3px cream outline with a 5px offset.
+- Respect `prefers-reduced-motion: reduce` by removing play-link transitions.
+- Set `color-scheme: dark` and maintain readable text contrast.
+
+## Verification checklist
+
+- Open `index.html` and confirm that the crown, headings, introduction, both cards, and footer appear.
+- Confirm the purple-and-gold royal styling on desktop and mobile widths.
+- Activate `Play Knight →` and verify it opens `game.html`.
+- Activate `Play Arcade Rivals →` and verify it opens `Game2.html`.
+- Use each game's back-to-menu link to return to the index.
+- Tab through both play links and confirm that the focus outline is visible.
+- Confirm that the layout stacks below the 640px breakpoint and has no horizontal overflow.
+
+## Complete index HTML
+
+The following is a snapshot of `index.html`. When the index changes, update the requirements and this source snapshot together.
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#211030">
+<title>My Arcade — The Royal Collection</title>
+<style>
+:root{color-scheme:dark;--gold:#e8c778;--cream:#fff3d6;--muted:#c9bbd4}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 0, #51315d 0, transparent 60%),linear-gradient(135deg,#211030,#120a1d);color:var(--cream);font-family:'Trebuchet MS',sans-serif}
+body::before{content:"";position:fixed;inset:14px;border:1px solid #e8c77840;pointer-events:none}
+main{width:min(100% - 48px,980px);padding:56px 0}
+.crest{width:76px;height:76px;margin:0 auto 22px;display:grid;place-items:center;border:1px solid #e8c77880;border-radius:50%;background:linear-gradient(145deg,#e8c77815,#e8c77805);color:var(--gold);font:48px Georgia,serif;box-shadow:0 0 40px #e8c7780d}
+.eyebrow{text-align:center;text-transform:uppercase;letter-spacing:.25em;color:var(--gold);font-size:.75rem}
+h1{text-align:center;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:clamp(48px,9vw,92px);margin:16px 0;color:var(--cream);text-shadow:0 4px 24px #0006}
+.divider{display:flex;align-items:center;justify-content:center;gap:16px;color:var(--gold);margin:22px auto;max-width:280px}
+.divider::before,.divider::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--gold))}
+.divider::after{transform:rotate(180deg)}
+.intro{text-align:center;color:var(--muted);line-height:1.7;margin:0 0 38px}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
+.card{position:relative;padding:28px;border:1px solid #b5904f;border-radius:16px;background:linear-gradient(145deg,#392246,#21132f);display:flex;flex-direction:column;box-shadow:inset 0 0 0 5px #e8c77805,0 16px 40px #0003}
+.art{height:150px;display:grid;place-items:center;border:1px solid #e8c77830;border-radius:8px;background:radial-gradient(ellipse at center,#3b5347,#182e29);font:76px Georgia,serif;color:var(--gold);text-shadow:0 4px 20px #0006}
+.arena .art{background:radial-gradient(ellipse at center,#614068,#2c193b)}
+.tag{margin:24px 0 10px;color:var(--gold);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
+h2{margin:0;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:1.65rem;line-height:1.25}
+.description{color:var(--muted);line-height:1.7;flex:1;margin:16px 0 24px}
+.play{display:block;text-align:center;padding:15px 18px;border:1px solid #f7dfa0;border-radius:6px;background:linear-gradient(135deg,#f1d696,#ceaa59);color:#2a1736;text-decoration:none;font-weight:bold;transition:background .2s,box-shadow .2s}
+.play:hover{background:linear-gradient(135deg,#ffe8b1,#e7c779);box-shadow:0 4px 20px #e8c77826}
+.play:focus-visible{outline:3px solid var(--cream);outline-offset:5px}
+.footer{text-align:center;margin:30px 0 0;color:var(--gold);font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:.9rem}
+@media(max-width:640px){main{padding:36px 0;width:calc(100% - 40px)}.games{grid-template-columns:1fr}.card{padding:22px}body::before{inset:8px}.eyebrow{letter-spacing:.17em}}
+@media(prefers-reduced-motion:reduce){.play{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<div class="crest" aria-hidden="true">♛</div>
+<p class="eyebrow">The Royal Collection</p>
+<h1>My Arcade</h1>
+<div class="divider" aria-hidden="true">◆</div>
+<p class="intro">Your next adventure awaits, Your Majesty.<br>Choose your challenge and claim your glory.</p>
+<section class="games" aria-label="Choose a game">
+<article class="card ready">
+<div class="art" aria-hidden="true">⚔</div>
+<p class="tag">Game 01 · Survival</p>
+<h2>Knight of the Emerald Keep</h2>
+<p class="description">Defend the kingdom against slime hordes and powerful bosses. Swing your sword, raise your shield, and survive each level.</p>
+<a class="play" href="game.html">Play Knight →</a>
+</article>
+<article class="card ready arena">
+<div class="art" aria-hidden="true">⚡</div>
+<p class="tag">Game 02 · Two-player arena</p>
+<h2>Arcade Rivals</h2>
+<p class="description">Challenge a friend with 10 unique fighters, special moves, summons, and powerful ultimates across three arenas.</p>
+<a class="play" href="Game2.html">Play Arcade Rivals →</a>
+</article>
+</section>
+<p class="footer">A kingdom of games. A legacy of champions.</p>
+</main>
+</body>
+</html>
+```
+

@@ -1,0 +1,177 @@
+﻿<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade Rivals</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101326;color:#edf1ff;font:16px system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:24px}a{color:#a9deff}h1{font-size:42px;margin:18px 0 6px}h2{margin-top:0}.sub{color:#b4bfda}button,input,select{font:inherit;padding:10px;border-radius:8px;border:1px solid #687299;background:#252d4a;color:white}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible,a:focus-visible{outline:3px solid #9fecff;outline-offset:3px}.roster{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.card{text-align:left;min-height:135px}.card.p1{outline:3px solid #65baff}.card.p2{box-shadow:inset 0 0 0 3px #ffa97f}.icon{font-size:32px}small{display:block;color:#b9c4df;margin-top:8px}.panel{background:#1c223b;border:1px solid #3b476c;padding:20px;border-radius:14px;margin-top:20px}.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.hud{display:flex;gap:24px;margin:16px 0}.hud>div{flex:1}progress{width:100%;height:20px;accent-color:#71c8fa}canvas{width:100%;display:block;border-radius:12px;border:1px solid #566281;background:#151e36}#arena{position:relative}#result{position:absolute;inset:0;background:#101326e8;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:12px}#result[hidden],[hidden]{display:none!important}#result h2{font-size:36px}.map{padding:24px}.notice{min-height:25px;color:#a6eacb}@media(max-width:700px){.roster{grid-template-columns:repeat(2,1fr)}h1{font-size:30px}}
+</style><style>
+:root{color-scheme:dark;--gold:#e8c778;--cream:#fff3d6;--muted:#c9bbd4}
+body{background:radial-gradient(ellipse at top,#51315d,transparent 65%),#160c22;color:var(--cream);font-family:'Trebuchet MS',sans-serif}
+main{padding-top:32px;padding-bottom:40px}h1,h2{font-family:Georgia,'Times New Roman',serif;color:var(--cream);font-weight:normal}h1{letter-spacing:.02em}header small,.sub{color:var(--gold)}p,small{color:var(--muted);line-height:1.6}a,.menu-link{color:var(--gold)}.menu-link,main>a:first-child{display:inline-block;padding:10px 16px;border:1px solid #b5904f;border-radius:6px;text-decoration:none;background:#2c193b}.menu-link:hover,main>a:first-child:hover{background:#40264f}
+button{background:linear-gradient(135deg,#f1d696,#ceaa59);color:#2a1736;border:1px solid #f7dfa0;border-radius:6px;font-weight:bold}button:hover:enabled{background:linear-gradient(135deg,#ffe8b1,#e7c779)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--cream);outline-offset:4px}input,select{background:#251431;color:var(--cream);border:1px solid #b5904f}
+.panel,.hud{background:linear-gradient(145deg,#392246,#21132f);border:1px solid #b5904f;box-shadow:inset 0 0 0 4px #e8c77805,0 10px 30px #0002}.panel h2::before{content:'♛ ';color:var(--gold)}canvas{border-color:#b5904f;background:#21132f}.hud{padding:16px;border-radius:10px}.hud small{color:var(--muted)}#hearts{color:#ffa9ba}#status,.notice,#battle-status,dd,.panel li.active{color:var(--gold)}.panel li.done{color:#a4d7bc}kbd{background:#392246;color:var(--cream);border:1px solid #b5904f55}progress{accent-color:var(--gold)}#hud2 progress{accent-color:#c29ae8}.card{background:linear-gradient(145deg,#432952,#281735);color:var(--cream);border-color:#8c6a47}.card:hover:enabled{background:#51315d}.card.p1{outline-color:var(--gold)}.card.p2{box-shadow:inset 0 0 0 3px #c29ae8}.card:disabled{opacity:.65}.map{background:linear-gradient(145deg,#432952,#281735);color:var(--cream)}.map:hover:enabled{background:#51315d}#result{background:#1b0c2af0;border:1px solid #b5904f}#result h2{color:var(--gold)}
+@media(max-width:640px){header{flex-wrap:wrap;gap:8px}.hud{gap:12px}main{padding-top:22px}}
+</style></head><body><main>
+<a href="index.html">← Back to menu</a><h1>♛ Arcade Rivals</h1><p class="sub">The Royal Tournament · Two players. Ten champions. One crown.</p>
+<section id="selection">
+<div class="panel"><h2>Choose your royal champions</h2><p>Player 1: WASD to browse, Q to confirm. Player 2: arrows to browse, Shift to confirm. You can also use the selectors below.</p>
+<div class="roster" id="roster"></div><div class="row" style="margin-top:20px"><div><label for="choose1">Player 1</label><select id="choose1"></select><button id="confirm1">Confirm P1</button></div><div><label for="choose2">Player 2</label><select id="choose2"></select><button id="confirm2">Confirm P2</button></div></div>
+<p id="pick-status" class="notice" role="status"></p></div>
+<form id="secret" class="panel"><label for="secret-input">Secret code</label> <input id="secret-input" autocomplete="off"><button>Unlock</button><span id="secret-status" role="status"></span></form>
+</section>
+<section id="maps" class="panel" hidden><h2>Choose a royal battlefield</h2><p>Different platforms change your approach.</p><div class="row"><button class="map" data-map="0">Moonlit Keep<br>Balanced platforms</button><button class="map" data-map="1">Ember Pit<br>High central perch</button><button class="map" data-map="2">Crystal Garden<br>Stepping platforms</button></div><button id="back-picks">Change fighters</button></section>
+<section id="battle" hidden><div class="hud"><div id="hud1"></div><div id="hud2"></div></div><div id="arena"><canvas id="canvas" width="1000" height="540" aria-label="Two-player platform fighting arena"></canvas><div id="result" hidden><div><h2 id="winner"></h2><p id="result-info"></p><button id="replay">Replay</button> <button id="repick">Change fighters</button> <a href="index.html">Back to menu</a></div></div></div>
+<p>Player 1: A/D move · Space jump · S melee · Q special<br>Player 2: ←/→ move · ↑ jump · ↓ melee · Shift special<br>Hold melee + special together for an ultimate. Ultimates recharge every 10 seconds. P pauses. Release attack keys before pressing again.</p><button id="pause">Pause / Resume</button><p id="battle-status" role="status"></p></section>
+</main><script>
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
+const fighters=[
+{name:'Azure Slime',icon:'💧',color:'#65baff',hp:1000,melee:'Blue fist',special:'Clone turret',ult:'Copy enemy ultimate ×2'},
+{name:'Ember Fox',icon:'🦊',color:'#ff9968',hp:900,melee:'Flame claw',special:'Fire dash',ult:'Meteor rain'},
+{name:'Frost Owl',icon:'🦉',color:'#a6e9ff',hp:950,melee:'Wing sweep',special:'Freezing shard',ult:'Blizzard ring'},
+{name:'Thorn Stag',icon:'🦌',color:'#9ce49d',hp:1100,melee:'Antler thrust',special:'Thorn trap',ult:'Root eruption'},
+{name:'Volt Cat',icon:'🐱',color:'#ffe078',hp:850,melee:'Spark swipe',special:'Chain lightning',ult:'Thunder beam'},
+{name:'Stone Golem',icon:'🗿',color:'#bcae9d',hp:1300,melee:'Ground slam',special:'Rolling boulder',ult:'Earthquake'},
+{name:'Shadow Bat',icon:'🦇',color:'#bc8bf1',hp:900,melee:'Draining bite',special:'Shadow step',ult:'Night swarm'},
+{name:'Tide Turtle',icon:'🐢',color:'#6fdec9',hp:1200,melee:'Shell bash',special:'Bubble guard',ult:'Tidal surge'},
+{name:'Sun Phoenix',icon:'🔥',color:'#ffc281',hp:900,melee:'Burning peck',special:'Healing feather',ult:'Solar nova'},
+{name:'Iron Beetle',icon:'🪲',color:'#d2b6f1',hp:1150,melee:'Pincer crush',special:'Drone sentry',ult:'Rocket barrage'}
+];
+const maps=[
+{name:'Moonlit Keep',top:'#211030',bottom:'#665079',platforms:[[180,380,180],[640,380,180],[425,290,150]]},
+{name:'Ember Pit',top:'#30132f',bottom:'#965b49',platforms:[[110,410,160],[390,310,220],[730,410,160]]},
+{name:'Crystal Garden',top:'#24133c',bottom:'#506c71',platforms:[[100,400,150],[310,330,140],[550,330,140],[750,400,150]]}
+];
+let unlocked=3;try{unlocked=Math.max(3,Math.min(10,Number(localStorage.getItem('rivals-unlocked'))||3));}catch{}
+let picks=[0,1],confirmed=[false,false],phase='select',mapId=0,players=[],shots=[],summons=[],zones=[],texts=[],effects=[],keys=new Set(),last=0;
+function saveUnlock(){try{localStorage.setItem('rivals-unlocked',String(unlocked));}catch{}}
+function renderPicks(){
+ $('roster').innerHTML=fighters.map((f,i)=>'<button class="card '+(picks[0]===i?'p1 ':'')+(picks[1]===i?'p2':'')+'" data-fighter="'+i+'" '+(i>=unlocked?'disabled':'')+'><span class="icon">'+f.icon+'</span> '+f.name+'<small>'+ (i>=unlocked?'Locked — finish matches to unlock':f.melee+' · '+f.special+' · '+f.ult)+'</small></button>').join('');
+ for(let p=0;p<2;p++){$('choose'+(p+1)).innerHTML=fighters.map((f,i)=>'<option value="'+i+'" '+(i>=unlocked?'disabled':'')+'>'+f.name+(i>=unlocked?' (locked)':'')+'</option>').join('');$('choose'+(p+1)).value=picks[p];}
+ $('pick-status').textContent='P1: '+fighters[picks[0]].name+(confirmed[0]?' ✓':' — choose')+' | P2: '+fighters[picks[1]].name+(confirmed[1]?' ✓':' — choose');
+}
+function confirm(p){if(picks[p]>=unlocked)return;confirmed[p]=true;renderPicks();if(confirmed.every(Boolean)){phase='map';keys.clear();$('selection').hidden=true;$('maps').hidden=false;}}
+function chooseScreen(){phase='select';keys.clear();confirmed=[false,false];$('selection').hidden=false;$('maps').hidden=true;$('battle').hidden=true;$('result').hidden=true;renderPicks();}
+$('roster').onclick=e=>{const b=e.target.closest('[data-fighter]');if(!b||b.disabled)return;const p=confirmed[0]?1:0;picks[p]=Number(b.dataset.fighter);confirmed[p]=false;renderPicks();};
+for(let p=0;p<2;p++){$('choose'+(p+1)).onchange=e=>{picks[p]=Number(e.target.value);confirmed[p]=false;renderPicks();};$('confirm'+(p+1)).onclick=()=>confirm(p);}
+$('secret').onsubmit=e=>{e.preventDefault();if($('secret-input').value.trim().toLowerCase()==='mo'){unlocked=10;saveUnlock();renderPicks();$('secret-status').textContent=' All 10 characters unlocked!';}else $('secret-status').textContent=' Unknown code.';$('secret-input').value='';};
+$('back-picks').onclick=chooseScreen;$('repick').onclick=chooseScreen;
+document.querySelectorAll('[data-map]').forEach(b=>b.onclick=()=>startMatch(Number(b.dataset.map)));
+$('replay').onclick=()=>startMatch(mapId);
+function startMatch(id){
+ mapId=id;phase='fight';keys.clear();shots=[];summons=[];zones=[];texts=[];effects=[];
+ players=picks.map((kind,i)=>({kind,id:i,x:i?780:180,y:400,w:36,h:46,vy:0,face:i?-1:1,hp:fighters[kind].hp,melee:0,special:0,ult:10,regen:0,slow:0,guard:0,dash:0,ground:false,combo:false,swing:0}));
+ $('selection').hidden=true;$('maps').hidden=true;$('battle').hidden=false;$('result').hidden=true;$('battle-status').textContent='Fight! Ultimates ready in 10 seconds.';document.activeElement.blur();hud();
+}
+const control=[{left:'KeyA',right:'KeyD',jump:'Space',melee:'KeyS',special:'KeyQ'},{left:'ArrowLeft',right:'ArrowRight',jump:'ArrowUp',melee:'ArrowDown',special:'ShiftLeft'}];
+function held(code){return code==='ShiftLeft'?(keys.has('ShiftLeft')||keys.has('ShiftRight')):keys.has(code);}
+function pause(){if(phase==='fight'){phase='pause';keys.clear();$('battle-status').textContent='Paused — press P or Pause / Resume.';}else if(phase==='pause'){phase='fight';$('battle-status').textContent='Fight!';}}
+$('pause').onclick=()=>{pause();$('pause').blur();};
+addEventListener('blur',()=>{keys.clear();if(phase==='fight')pause();});
+addEventListener('keydown',e=>{
+ if(e.target.matches('input,select,textarea,button,a'))return;
+ const gameKeys=['Space','KeyA','KeyD','KeyW','KeyS','KeyQ','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','ShiftLeft','ShiftRight','KeyP'];
+ if(!gameKeys.includes(e.code))return;e.preventDefault();if(e.repeat)return;keys.add(e.code);
+ if(e.code==='KeyP'){pause();return;}
+ if(phase==='select'){if(e.code==='Space')return;
+ const p=e.code.startsWith('Arrow')||e.code.startsWith('Shift')?1:0;
+ if(e.code==='KeyQ'||e.code.startsWith('Shift')){confirm(p);return;}
+ const delta=['KeyA','ArrowLeft'].includes(e.code)?-1:['KeyD','ArrowRight'].includes(e.code)?1:['KeyW','ArrowUp'].includes(e.code)?-5:5;
+ picks[p]=(picks[p]+delta+10)%10;confirmed[p]=false;renderPicks();
+ }
+ if(phase==='fight')for(const p of players){if(e.code===control[p.id].jump&&p.ground){p.vy=-540;p.ground=false;}}
+});
+addEventListener('keyup',e=>keys.delete(e.code));
+function intersects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;}
+function damage(target,amount,owner){
+ if(target.id===owner||target.owner===owner||target.hp<=0)return;
+ const actual=Math.min(target.hp,Math.round(amount*(target.guard>0?.35:1)));target.hp-=actual;texts.push({x:target.x,y:target.y-10,text:'−'+actual,color:'#ffb3ae',life:1});
+}
+function targets(owner){return [...players.filter(p=>p.id!==owner),...summons.filter(s=>s.owner!==owner)];}
+function hitArea(p,area,amount){for(const t of targets(p.id))if(intersects(area,t))damage(t,amount,p.id);}
+function projectile(owner,x,y,vx,vy,damageValue,color,extra={}){shots.push({owner,x,y,w:14,h:12,vx,vy,damage:damageValue,color,life:3,...extra});}
+function aim(p,speed=360){const other=players[1-p.id],dx=other.x-p.x,dy=other.y-p.y,len=Math.hypot(dx,dy)||1;return [dx/len*speed,dy/len*speed];}
+function melee(p){
+ const ranges=[66,78,98,106,60,115,48,70,88,52],amounts=[45,52,38,58,34,75,40,55,42,85];
+ p.melee=[.45,.5,.6,.65,.28,.9,.5,.6,.4,.8][p.kind];p.swing=.18;
+ const r=ranges[p.kind],area={x:p.face>0?p.x+p.w:p.x-r,y:p.y-5,w:r,h:p.h+15};
+ hitArea(p,area,amounts[p.kind]);
+ if(p.kind===6&&intersects(area,players[1-p.id]))p.hp=Math.min(fighters[p.kind].hp,p.hp+20);
+ if(p.kind===7)p.x=Math.max(0,Math.min(964,p.x+p.face*30));
+ effects.push({...area,life:.18,color:fighters[p.kind].color});
+}
+function special(p){
+ p.special=[5,4,4,5,4,6,5,7,7,6][p.kind];const enemy=players[1-p.id],color=fighters[p.kind].color;
+ if(p.kind===0||p.kind===9){summons.push({owner:p.id,x:p.x-p.face*36,y:490-30,w:28,h:30,hp:p.kind===0?10:25,timer:0,life:12,drone:p.kind===9});}
+ if(p.kind===1){p.dash=.3;projectile(p.id,p.x,p.y+20,p.face*640,0,70,color,{w:60,h:30});}
+ if(p.kind===2){const [vx,vy]=aim(p);projectile(p.id,p.x,p.y+15,vx,vy,55,color,{slow:2});}
+ if(p.kind===3)zones.push({owner:p.id,x:Math.max(0,Math.min(900,p.x+p.face*100)),y:450,w:100,h:40,delay:.5,life:3,tick:0,damage:25,color});
+ if(p.kind===4){if(Math.abs(enemy.x-p.x)<330){damage(enemy,60,p.id);for(const s of summons)if(s.owner!==p.id&&Math.abs(s.x-enemy.x)<200)damage(s,40,p.id);}effects.push({x:Math.min(p.x,enemy.x),y:p.y+20,w:Math.min(330,Math.abs(enemy.x-p.x)),h:7,life:.3,color});}
+ if(p.kind===5)projectile(p.id,p.x,450,p.face*220,0,100,color,{w:40,h:40,life:4});
+ if(p.kind===6){p.x=Math.max(0,Math.min(964,enemy.x-enemy.face*70));p.y=enemy.y;hitArea(p,{x:p.x-30,y:p.y,w:100,h:60},60);}
+ if(p.kind===7){p.guard=3;p.hp=Math.min(fighters[p.kind].hp,p.hp+35);}
+ if(p.kind===8){p.hp=Math.min(fighters[p.kind].hp,p.hp+120);projectile(p.id,p.x,p.y,p.face*250,-50,35,color,{w:22,h:22});}
+}
+function ultimate(p,kind=p.kind,mult=1){
+ if(kind===0){const copied=players[1-p.id].kind;ultimate(p,copied===0?4:copied,mult*2);return;}
+ const enemy=players[1-p.id],color=fighters[kind].color;
+ if(kind===1)for(let i=0;i<7;i++)projectile(p.id,Math.max(0,Math.min(970,enemy.x-180+i*60)),-70-i*25,0,360,55*mult,color,{w:28,h:28,life:4});
+ if(kind===2)for(let i=0;i<12;i++){const a=i*Math.PI/6;projectile(p.id,p.x,p.y,Math.cos(a)*240,Math.sin(a)*240,45*mult,color,{slow:2,life:2});}
+ if(kind===3)for(let i=0;i<5;i++)zones.push({owner:p.id,x:Math.max(0,Math.min(920,enemy.x-160+i*80)),y:415,w:70,h:75,delay:.4+i*.1,life:1.8,tick:0,damage:45*mult,color});
+ if(kind===4){hitArea(p,{x:p.face>0?p.x:0,y:p.y-8,w:p.face>0?1000-p.x:p.x+36,h:65},230*mult);effects.push({x:p.face>0?p.x:0,y:p.y,w:p.face>0?1000-p.x:p.x+36,h:40,life:.6,color});}
+ if(kind===5)zones.push({owner:p.id,x:0,y:455,w:1000,h:40,delay:.5,life:2,tick:0,damage:55*mult,color});
+ if(kind===6)for(let i=0;i<6;i++){const [vx,vy]=aim(p,260+i*12);projectile(p.id,p.x-i*p.face*28,p.y-30+i*12,vx,vy,45*mult,color,{w:24,h:16,life:4});}
+ if(kind===7)projectile(p.id,p.x,360,p.face*320,0,210*mult,color,{w:85,h:130,life:4});
+ if(kind===8){p.hp=Math.min(fighters[p.kind].hp,p.hp+180);hitArea(p,{x:p.x-190,y:p.y-190,w:416,h:426},200*mult);effects.push({x:p.x-190,y:p.y-190,w:416,h:426,life:.7,color});}
+ if(kind===9)for(let i=0;i<5;i++){const [vx,vy]=aim(p,340);projectile(p.id,p.x-i*p.face*45,p.y-15,vx,vy,65*mult,color,{w:24,h:14,life:4});}
+ texts.push({x:p.x,y:p.y-35,text:fighters[kind].ult+(mult>1?' ×'+mult:''),color:'#fff1a9',life:1.5});
+}
+function finish(){
+ phase='over';keys.clear();unlocked=Math.min(10,unlocked+1);saveUnlock();
+ $('winner').textContent=players.every(p=>p.hp<=0)?'Draw!':'Player '+(players[0].hp>0?1:2)+' wins!';
+ $('result-info').textContent='Replay this match or choose another fighter. '+unlocked+' / 10 characters unlocked.';
+ $('result').hidden=false;$('replay').focus();
+}
+function hud(){players.forEach((p,i)=>{$('hud'+(i+1)).innerHTML='<b>'+fighters[p.kind].icon+' P'+(i+1)+' · '+fighters[p.kind].name+'</b><progress max="'+fighters[p.kind].hp+'" value="'+p.hp+'"></progress><small>'+Math.ceil(p.hp)+' / '+fighters[p.kind].hp+' HP · Special '+(p.special>0?p.special.toFixed(1)+'s':'ready')+' · Ultimate '+(p.ult>0?p.ult.toFixed(1)+'s':'READY')+'</small>';});}
+function update(dt){
+ if(phase!=='fight')return;
+ for(const p of players){
+ for(const k of ['melee','special','ult','slow','guard','dash','swing'])p[k]=Math.max(0,p[k]-dt);
+ if(p.kind===0&&p.hp>0){p.regen+=dt;while(p.regen>=.2){p.regen-=.2;p.hp=Math.min(1000,p.hp+1);}}
+ const c=control[p.id],dir=Number(held(c.right))-Number(held(c.left));if(dir)p.face=dir;
+ p.x=Math.max(0,Math.min(964,p.x+(p.dash>0?p.face*620:dir*(p.slow>0?130:260))*dt));
+ const oldBottom=p.y+p.h;p.vy+=1250*dt;p.y+=p.vy*dt;p.ground=false;
+ for(const [x,y,w] of [...maps[mapId].platforms,[0,490,1000]])if(p.vy>=0&&oldBottom<=y+1&&p.y+p.h>=y&&p.x+p.w>x&&p.x<x+w){p.y=y-p.h;p.vy=0;p.ground=true;}
+ const m=held(c.melee),s=held(c.special);
+ if(m&&s){if(!p.combo&&p.ult===0){ultimate(p);p.ult=10;}p.combo=true;}
+ else {p.combo=false;if(m&&!p.mHeld&&p.melee===0)melee(p);if(s&&!p.sHeld&&p.special===0)special(p);}
+ p.mHeld=m;p.sHeld=s;
+ }
+ for(const s of summons){s.life-=dt;s.timer-=dt;if(s.hp<=0)continue;if(s.timer<=0){const enemy=players[1-s.owner],dx=enemy.x-s.x,dy=enemy.y-s.y,len=Math.hypot(dx,dy)||1;projectile(s.owner,s.x,s.y,dx/len*300,dy/len*300,s.drone?18:10,s.drone?'#d2b6f1':'#65baff');s.timer=s.drone?1:.7;}}
+ for(const b of shots){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(const t of targets(b.owner))if(t.hp>0&&intersects(b,t)){damage(t,b.damage,b.owner);if(b.slow&&t.id!==undefined)t.slow=b.slow;b.life=0;break;}}
+ shots=shots.filter(b=>b.life>0&&b.x>-100&&b.x<1100&&b.y<600);
+ for(const z of zones){if(z.delay>0){z.delay-=dt;continue;}z.life-=dt;z.tick-=dt;if(z.tick<=0){for(const t of targets(z.owner))if(intersects(z,t))damage(t,z.damage,z.owner);z.tick=.5;}}
+ zones=zones.filter(z=>z.life>0);summons=summons.filter(s=>s.hp>0&&s.life>0);
+ for(const t of texts){t.life-=dt;t.y-=22*dt;}texts=texts.filter(t=>t.life>0);
+ for(const e of effects)e.life-=dt;effects=effects.filter(e=>e.life>0);
+ hud();if(players.some(p=>p.hp<=0))finish();
+}
+function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
+function draw(){
+ const map=maps[mapId],gradient=ctx.createLinearGradient(0,0,0,540);gradient.addColorStop(0,map.top);gradient.addColorStop(1,map.bottom);ctx.fillStyle=gradient;ctx.fillRect(0,0,1000,540);
+ for(let i=0;i<9;i++)rect(i*130,180+(i%3)*35,75,310,'#302039');
+ // Gilded battlements and royal tournament banners.
+ for(let i=0;i<9;i++){const bx=i*130,by=180+(i%3)*35;for(let j=0;j<3;j++)rect(bx+j*28,by-14,18,18,'#302039');rect(bx+27,by+28,22,38,'#e8c778');rect(bx+20,by+92,35,76,'#703d87');rect(bx+20,by+92,35,4,'#e8c778');ctx.font='24px Georgia';ctx.textAlign='center';ctx.fillStyle='#e8c778';ctx.fillText('♛',bx+37,by+132);}
+ ctx.fillStyle='#e8e2bf';ctx.beginPath();ctx.arc(830,80,32,0,Math.PI*2);ctx.fill();
+ for(const [x,y,w] of [...map.platforms,[0,490,1000]]){rect(x,y,w,18,'#45304d');rect(x,y,w,4,'#e8c778');}
+ for(const z of zones){ctx.globalAlpha=z.delay>0?.25:.7;rect(z.x,z.y,z.w,z.h,z.color);}ctx.globalAlpha=1;
+ for(const s of summons){rect(s.x,s.y,s.w,s.h,s.drone?'#c5a4ec':'#4f96ef');rect(s.x+5,s.y+7,5,5,'white');rect(s.x+18,s.y+7,5,5,'white');ctx.fillStyle='white';ctx.font='11px system-ui';ctx.fillText('P'+(s.owner+1),s.x,s.y-8);}
+ for(const p of players){const f=fighters[p.kind];ctx.fillStyle=f.color;ctx.beginPath();ctx.ellipse(p.x+18,p.y+24,21,24,0,0,Math.PI*2);ctx.fill();rect(p.x+6,p.y-6,24,5,'#e8c778');for(let i=0;i<3;i++)rect(p.x+6+i*9,p.y-12,6,8,'#e8c778');ctx.font='28px serif';ctx.textAlign='center';ctx.fillText(f.icon,p.x+18,p.y+32);ctx.font='bold 12px system-ui';ctx.fillStyle='white';ctx.fillText('P'+(p.id+1),p.x+18,p.y-12);if(p.guard>0){ctx.strokeStyle='#a0f8f1';ctx.lineWidth=3;ctx.strokeRect(p.x-8,p.y-8,52,62);}}
+ for(const b of shots)rect(b.x,b.y,b.w,b.h,b.color);
+ for(const e of effects){ctx.globalAlpha=.5;rect(e.x,e.y,e.w,e.h,e.color);}ctx.globalAlpha=1;
+ ctx.font='bold 16px system-ui';for(const t of texts){ctx.fillStyle=t.color;ctx.fillText(t.text,t.x,t.y);}
+ if(phase==='pause'){rect(0,0,1000,540,'#190c29cc');ctx.fillStyle='white';ctx.font='bold 36px system-ui';ctx.textAlign='center';ctx.fillText('Paused',500,260);}
+}
+function frame(now){const dt=Math.min(.025,(now-last)/1000);last=now;update(dt);if(phase!=='select'&&phase!=='map')draw();requestAnimationFrame(frame);}
+renderPicks();requestAnimationFrame(frame);
+</script></body></html>
+
+
